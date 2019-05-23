@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .wrap{
+            width: 700px;
+            margin: 0 auto;
+        }
+        #chatCon{
+            width: 700px;
+            height: 500px;
+            border: 1px solid #ccc;
+            margin: 0 auto;
+            overflow-y: scroll;
+        }
+        #content{
+            margin: 0 auto;
+        }
+        .numb{
+            color: brown;
+        }
+        .msg{
+            display: inline-block;
+            padding: 10px;
+        }
+        .chat{
+            margin-bottom: 10px;
+        }
+        .chat1{
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .chat1 span{
+            float: right;
+        }
+        .chat1 .numb{
+            padding: 7px 10px;
+        }
+        .chat1 .msg{
+            background: rgb(54, 214, 54);
+            color: #fff;
+        }
+        .chat .msg{
+            background:burlywood;
+            color:#fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div id="chatCon">
+        </div>
+       
+
+        <textarea name="" id="content" cols="60" rows="10"></textarea>
+        <button id="btn">发送</button>
+    </div>
+
+    <script src="./js/jquery-3.3.1.js"></script>
+    <script src="http://169.254.28.143:3700/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io.connect("http://169.254.28.143:3700");
+        let userId = sessionStorage.getItem("userId");
+        if(!userId){
+            window.location.href = "/chatPage/enter.html"
+        }else{
+        //let socket = io.connect("http://169.254.28.143:3700");
+           
+
+            $("#btn").click(() => {
+                socket.emit('data', {
+                    id : userId,
+                    msg: $("#content").val()
+                }); 
+                $("#content").val("")
+                
+            })
+            var str = "";
+        }
+        socket.on("server message",(da) => {
+            str = ` <p class="chat">
+                        <span class='numb'>${da.msg.id}</span>
+                        <span class='msg'>${da.msg.msg}</span>
+                    </p>`
+            var chatCon = document.getElementById("chatCon");
+            chatCon.innerHTML += str;
+            
+        })
+        socket.on('data',(arr)=>{
+            str = ` <p class="chat1">
+                        <span class='numb'>${arr.msg.id}</span>
+                        <span class='msg'>${arr.msg.msg}</span>
+                    </p>`
+            var chatCon = document.getElementById("chatCon");
+            chatCon.innerHTML += str;
+            if($(".numb").html() == userId){
+                $(this).parent().addClass("flll");
+            }
+            
+        });
+        
+        
+    
+        
+
+    
+    
+    </script>
+</body>
+</html>
